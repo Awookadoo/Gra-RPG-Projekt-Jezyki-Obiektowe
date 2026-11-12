@@ -1,5 +1,8 @@
 #include "characters.h"
+#include "utility.h"
 #include <iostream>
+#include <string>
+#include <vector>
 using namespace std;
 
 Character::Character(string name_, CharacterClass characterClass_, int attack_, int maxHealth_, int mana_, int defense_) {
@@ -12,7 +15,7 @@ Character::Character(string name_, CharacterClass characterClass_, int attack_, 
 }
 
 Character::~Character() {
-    cout << "\nCharacter " << name << " is gone now. \n";
+    //cout << "\nCharacter " << name << " is gone now. \n";
 }
 
 Character* Character::createCharacter() {
@@ -24,13 +27,13 @@ Character* Character::createCharacter() {
         cout << "Choose a class (0 - Warrior, 1 - Mage, 2 - Archer): ";
 
         if (!(cin >> classChoice)) {
-            cout << "Invalid choice, try again. \n \n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+            cout << "Invalid choice, try again. \n";
+            clearInput();
             continue;
         }
 
         if (classChoice >= 0 && classChoice <= 2) {
+            clear();
             if (classChoice == 0) {
                 Warrior tempWarrior(name, 100);
                 tempWarrior.classDescription();
@@ -61,11 +64,11 @@ string Character::getClassName() const {
 }
 
 void Character::displayStats(ostream& os) const {
-    os << "\nName: " << name << "\n"
+    os << "Name: " << name << "\n"
        << "Attack: " << attack << "\n"
        << "Health: " << maxHealth << "\n"
        << "Mana: " << mana << "\n"
-       << "Defense: " << defense << "\n";
+       << "Defense: " << defense << "\n \n";
 }
 
 ostream& operator<<(ostream& os, const Character& character) {
@@ -82,13 +85,13 @@ Warrior::Warrior(string name_, int rage_) : Character(name_, CharacterClass::War
 }
 
 void Warrior::displayStats(ostream& os) const {
-    os << "\nClass: Warrior\n";
+    os << "Class: Warrior\n";
     Character::displayStats(os);
     os << "Rage: " << rage << "\n";
 }
 
 void Warrior::classDescription() {
-    cout << "\nWarrior: Adds a unique stat called Rage. \n \n";
+    cout << "Warrior: Adds a unique stat called Rage. \n \n";
     cout << "Attack: 10 -> 15 \n";
     cout << "Health: 50 -> 60 \n";
     cout << "Mana: 10 -> 5 \n";

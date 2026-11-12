@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 using namespace std;
 
 enum class CharacterClass {
