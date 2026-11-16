@@ -18,6 +18,7 @@ Character::~Character() {
     //cout << "\nCharacter " << name << " is gone now. \n";
 }
 
+//tworzenie postaci
 Character* Character::createCharacter() {
     string name; cout << "Choose a name: "; cin >> name;
     int classChoice;
@@ -38,9 +39,21 @@ Character* Character::createCharacter() {
                 Warrior tempWarrior(name, 100);
                 tempWarrior.classDescription();
             }
-            cout << "Is this your final choice? (y/n):"; cin >> confirmation;
+
+            if (classChoice == 1) {
+                Warrior tempWarrior(name, 100);
+                tempWarrior.classDescription();
+            }
+            if (classChoice == 2) {
+                Warrior tempWarrior(name, 100);
+                tempWarrior.classDescription();
+            }
+
+            cout << "Is this your final choice? (y/n): "; cin >> confirmation;
             if (confirmation == 'y') {
                 if (classChoice == 0) return new Warrior(name, 100);
+                if (classChoice == 1) return new Warrior(name, 100);
+                if (classChoice == 2) return new Warrior(name, 100);
             }
             cout << "\n";
         }
@@ -50,6 +63,7 @@ Character* Character::createCharacter() {
     }
 }
 
+//funkcja do pobierania nazwy klasy postaci (z enum)
 string Character::getClassName() const {
     switch (characterClass) {
         case CharacterClass::Warrior:
@@ -71,6 +85,7 @@ void Character::displayStats(ostream& os) const {
        << "Defense: " << defense << "\n \n";
 }
 
+//funkcja do wyświetlania statystyk postaci (przeciążenie operatora <<)
 ostream& operator<<(ostream& os, const Character& character) {
     character.displayStats(os);
     return os;
