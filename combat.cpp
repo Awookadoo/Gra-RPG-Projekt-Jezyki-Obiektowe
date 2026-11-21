@@ -83,16 +83,25 @@ void Combat::displayEnemies() const {
     cout << "\n\n";
 }
 
+//wspólne wyświetlanie
+void Combat::displayBattlefield() const{
+    clear();
+    displayParty();
+    cout << "--------------------------------------------------------------------------------\n\n";
+    displayEnemies();
+}
+
 //tura gracza ------------------------------------------------------------------------------------------
 void Combat::playerTurn(){
     for (Character* hero : activeParty){
         if (!hero->isAlive()) continue;
         if (!areEnemiesAlive()) break;
+        hero->resetGuard();
+        hero->resetFocus();
+        hero->restoreMana(1);
+
         while(true){
-            clear();
-            displayParty();
-            cout << "--------------------------------------------------------------------------------\n\n";
-            displayEnemies();
+            displayBattlefield();
             cout << "\n--- " << hero->getName() << "'s Turn ---\n";
             
             //wybieranie akcji ------------------------------------------------------------------------------------------
@@ -108,75 +117,82 @@ void Combat::playerTurn(){
                 pause();
                 continue;
             }
-            else if(action==1){
+            clearInput();
+            if(action==1){
+                displayBattlefield();
+                cout << "\n--- " << hero->getName() << "'s Turn ---\n";
                 cout << "\nChoose action: (not implemented yet, pick anything, always attacks)\n" <<
-                    "1. Attack.\n" <<
-                    "2. Guard.\n" <<
-                    "3. Heal.\n" <<
-                    "4. Wait.\n" <<
+                    "1. Attack -> Deal damage to an enemy.\n" <<
+                    "2. Guard -> Negate all damage until the next turn.\n" <<
+                    "3. Heal -> Heal yourself for 5 HP.\n" <<
+                    "4. Wait -> Gain back two more mana.\n" <<
                     "0. Cancel.\n\n";
                 char actionBasic; cin >> actionBasic;
+                clearInput();
                 while (actionBasic < '0' || actionBasic > '4'){
-                    clearInput();
                     cout << "Invalid option, try again. \n";
                     cin >> actionBasic;
+                    clearInput();
                 }
-                break;
+                if(actionBasic=='0'){
+                    continue;
+                }
+                else if(actionBasic=='1'){
+                    displayBattlefield();
+                    cout << "------------------\n \n";
+                    Monster* target = hero->selectTarget(enemies);
+                    hero->basicAttack(target);
+                    pause();
+                    break;
+                }
+                else if(actionBasic=='2'){
+                    hero->guard();
+                    pause();
+                    break;
+                }
+                else if(actionBasic=='3'){
+                    hero->heal();
+                    pause();
+                    break;
+                }
+                else if(actionBasic=='4'){
+                    hero->wait();
+                    pause();
+                    break;
+                }
             }
             else if(action==2){
-                cout << "\nChoose action: (always attacks)\n" <<
-                    "1. Not.\n" <<
-                    "2. Implemented.\n" <<
-                    "3. Yet.\n" <<
-                    "4. Lol.\n" <<
-                    "0. Cancel.\n\n";
-                char actionSkill; cin >> actionSkill;
-                while (actionSkill < '0' || actionSkill > '4'){
+                displayBattlefield();
+                cout << "\n--- " << hero->getName() << "'s Turn ---\n";
+                hero->showSkills();
+                int actionSkill;
+                if(!(cin>>actionSkill)){
                     clearInput();
-                    cout << "Invalid option, try again. \n";
-                    cin >> actionSkill;
+                    cout<<"Invalid skill choice, try again.\n";
+                    pause();
+                    continue;
                 }
+                clearInput();
+                if(actionSkill==0){
+                    continue;
+                }
+                if (!hero->useSkill(actionSkill, activeParty, enemies)) {
+                    pause();
+                    continue;
+                }
+                pause();
                 break;
             }
             else if(action==0){
                 flee = true;
                 return;
             }
+            else{
+                cout << "Invalid choice, try again.\n";
+                pause();
+            }
             clearInput();
         }
-
-        //wybieranie przeciwnika ------------------------------------------------------------------------------------------
-        clear();
-        displayParty();
-        cout << "--------------------------------------------------------------------------------\n\n";
-        displayEnemies();
-        cout << "------------------\n \n";
-        // for (int i = 0; i < enemies.size(); i++) {
-        //     cout << i + 1 << ". " << enemies[i]->getName() << " (" << enemies[i]->getHealth() << "/" << enemies[i]->getMaxHealth() << " HP)" << (enemies[i]->isAlive() ? "" : " [DEAD]") << "\n";
-        //     cout << "[ATK] " << enemies[i]->getAttack() << "   [DEF] " << enemies[i]->getDefense() << "\n \n";
-        // }
-
-        while(true){
-            int target;
-            cout << "Choose target: "; cin >> target; target--;
-            if (target < 0 || target >= enemies.size() || !enemies[target]->isAlive()) {
-                cout << "Invalid or dead target! Try again.\n";
-                clearInput();
-            }
-            else {
-                Monster* targetMonster = enemies[target];
-                int dmg = hero->getAttack() - targetMonster->getDefense();
-                targetMonster->takeDamage(dmg);
-
-                cout << "\n" << hero->getName() << " hits " << targetMonster->getName() << " for " << dmg << " damage!\n";
-                if (!targetMonster->isAlive()) {
-                    cout << targetMonster->getName() << " is defeated!\n";
-                }
-                clearInput();
-                break;
-            }
-        }
-        pause();
     }
 }
 

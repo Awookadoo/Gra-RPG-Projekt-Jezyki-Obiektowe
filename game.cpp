@@ -33,11 +33,11 @@ void Game::run(){
 void Game::displayMainMenu() const{
     cout << "In order to start, you need to have a party of 3 characters.\n" <<
                 "Currently you have " << currentPartyCount() << " characters in your party.\n \n" <<
-                "Input 1 to start the game if you created 3 or more characters.\n" <<
+                "Input 1 to start the game if you have a party of 3 characters.\n" <<
                 "Input 2 to start the character creator.\n" <<
                 "Input 3 to manage your current party.\n" <<
-                "Input 4 to add example heroes.\n" <<
-                "Input 5 to add example heroes to party.\n" <<
+                "Input 4 to add example characters.\n" <<
+                "Input 5 to add example characters to party.\n" <<
                 "Input 0 to exit the program.\n \n";
 }
 
@@ -65,6 +65,10 @@ void Game::mainMenu(){
             cout << "You have created a party of 3 characters. You can now start the game.\n";
             pause();
             startGame();
+        }
+        else if (choice == '1' && currentPartyCount() > 3){
+            cout << "You have too many characters in your party. Remove some.\n";
+            pause();
         }
         //kreator postaci
         else if (choice == '2'){
@@ -263,12 +267,9 @@ void Game::startGame(){
         survived = battle.startCombat();
         if(survived){
             clear();
-            cout << "\nWave " << wave << " cleared!\n";
-            // for (Character* hero : combatParty) {
-            //     if (hero->isAlive()) {
-            //         hero->heal(10); // Or restore a bit of mana
-            //     }
-            // }
+            cout << "-----------------------------\n" <<
+                    "\nWave " << wave << " cleared!\n" <<
+                    "-----------------------------\n";
             wave++;
             pause();
         }

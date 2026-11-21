@@ -12,6 +12,13 @@ using namespace std;
 Monster::Monster(string name, int attack, int maxHealth, int defense) : Character(name, attack, maxHealth, 0, defense){}
 
 void Monster::takeTurn(vector<Character*>& playerParty){
+    //szukanie focusing
+    for (Character* hero : playerParty) {
+        if (hero->isAlive() && hero->isFocusing()) {
+            attackTarget(hero);
+            return;
+        }
+    }
     //szukanie żywych postaci
     vector<Character*> aliveCharacters;
     for (Character* hero : playerParty){
@@ -48,25 +55,25 @@ void Monster::statUp(int loop){
 Goblin::Goblin() : Monster("Goblin", 10, 30, 2) {}
 
 void Goblin::attackTarget(Character* target) {
-    int dmg = attack - target->getDefense();
-    target->takeDamage(dmg);
+    int dmg = attack - target->getTrueDEF();
     cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
+    target->takeDamage(dmg);
 }
 
 Skeleton::Skeleton() : Monster("Skeleton", 15, 25, 2) {}
 
 void Skeleton::attackTarget(Character* target) {
     //int specialAttack = target->getDefense() / 2; piercing 50% armor
-    int dmg = attack - target->getDefense();
-    target->takeDamage(dmg);
+    int dmg = attack - target->getTrueDEF();
     cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
+    target->takeDamage(dmg);
 }
 
 Boss::Boss() : Monster("Boss", 12, 40, 5) {}
 
 void Boss::attackTarget(Character* target) {
     //int specialAttack = target->getDefense() / 2; piercing 50% armor
-    int dmg = attack - target->getDefense();
-    target->takeDamage(dmg);
+    int dmg = attack - target->getTrueDEF();
     cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
+    target->takeDamage(dmg);
 }
