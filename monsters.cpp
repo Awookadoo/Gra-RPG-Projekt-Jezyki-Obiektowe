@@ -61,3 +61,12 @@ void Skeleton::attackTarget(Character* target) {
     target->takeDamage(dmg);
     cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
 }
+
+Boss::Boss() : Monster("Boss", 12, 40, 5) {}
+
+void Boss::attackTarget(Character* target) {
+    //int specialAttack = target->getDefense() / 2; piercing 50% armor
+    int dmg = attack - target->getDefense();
+    target->takeDamage(dmg);
+    cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
+}

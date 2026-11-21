@@ -54,6 +54,35 @@ void Combat::displayParty() const{
     cout << "\n\n";
 }
 
+//wyświetlanie przeciwników ------------------------------------------------------------------------------------------
+void Combat::displayEnemies() const {
+    const int colWidth = 28;
+    int count = enemies.size();
+    cout << left;
+
+    //rząd 1 - nazwa potwora
+    for (int i = 0; i < count; i++) {
+        string status = enemies[i]->isAlive() ? "" : " [DEAD]";
+        string showName = "[" + to_string(i + 1) + "] " + enemies[i]->getName() + status;
+        cout << setw(colWidth) << showName;
+    }
+    cout << "\n";
+
+    //rząd 2 - aktualne HP
+    for (int i = 0; i < count; i++) {
+        string showHP = "HP: " + to_string(enemies[i]->getHealth()) + "/" + to_string(enemies[i]->getMaxHealth());
+        cout << setw(colWidth) << showHP;
+    }
+    cout << "\n";
+
+    //rząd - ATK & DEF
+    for (int i = 0; i < count; i++) {
+        string showATKDEF = "ATK: " + to_string(enemies[i]->getAttack()) + " | DEF: " + to_string(enemies[i]->getDefense());
+        cout << setw(colWidth) << showATKDEF;
+    }
+    cout << "\n\n";
+}
+
 //tura gracza ------------------------------------------------------------------------------------------
 void Combat::playerTurn(){
     for (Character* hero : activeParty){
@@ -62,6 +91,8 @@ void Combat::playerTurn(){
         while(true){
             clear();
             displayParty();
+            cout << "--------------------------------------------------------------------------------\n\n";
+            displayEnemies();
             cout << "\n--- " << hero->getName() << "'s Turn ---\n";
             
             //wybieranie akcji ------------------------------------------------------------------------------------------
@@ -70,8 +101,14 @@ void Combat::playerTurn(){
                     "2. Special skills.\n" <<
                     "0. Flee and end the game.\n\n";
 
-            int action; cin >> action;
-            if(action==1){
+            int action;
+            if (!(cin >> action)) {
+                clearInput();
+                cout << "Invalid choice, try again.\n";
+                pause();
+                continue;
+            }
+            else if(action==1){
                 cout << "\nChoose action: (not implemented yet, pick anything, always attacks)\n" <<
                     "1. Attack.\n" <<
                     "2. Guard.\n" <<
@@ -105,24 +142,23 @@ void Combat::playerTurn(){
                 flee = true;
                 return;
             }
-            else{
-                cout << "Invalid choice, try again.";
-            }
             clearInput();
         }
 
         //wybieranie przeciwnika ------------------------------------------------------------------------------------------
         clear();
         displayParty();
+        cout << "--------------------------------------------------------------------------------\n\n";
+        displayEnemies();
         cout << "------------------\n \n";
-        for (int i = 0; i < enemies.size(); i++) {
-            cout << i + 1 << ". " << enemies[i]->getName() << " (" << enemies[i]->getHealth() << "/" << enemies[i]->getMaxHealth() << " HP)" << (enemies[i]->isAlive() ? "" : " [DEAD]") << "\n";
-            cout << "[ATK] " << enemies[i]->getAttack() << "   [DEF] " << enemies[i]->getDefense() << "\n \n";
-        }
+        // for (int i = 0; i < enemies.size(); i++) {
+        //     cout << i + 1 << ". " << enemies[i]->getName() << " (" << enemies[i]->getHealth() << "/" << enemies[i]->getMaxHealth() << " HP)" << (enemies[i]->isAlive() ? "" : " [DEAD]") << "\n";
+        //     cout << "[ATK] " << enemies[i]->getAttack() << "   [DEF] " << enemies[i]->getDefense() << "\n \n";
+        // }
 
         while(true){
             int target;
-            cout << "\nChoose target: "; cin >> target; target--;
+            cout << "Choose target: "; cin >> target; target--;
             if (target < 0 || target >= enemies.size() || !enemies[target]->isAlive()) {
                 cout << "Invalid or dead target! Try again.\n";
                 clearInput();
@@ -155,7 +191,7 @@ void Combat::enemyTurn(){
     }
 }
 
-//warunki do gry ------------------------------------------------------------------------------------------
+//warunki do gry
 bool Combat::isPartyAlive() const{
     for (const Character * hero : activeParty){
         if (hero->isAlive()){
@@ -174,16 +210,16 @@ bool Combat::areEnemiesAlive() const{
     return false;
 }
 
-//rozpoczęcie walki ------------------------------------------------------------------------------------------
+//rozpoczęcie walki
 bool Combat::startCombat(){
     while(isPartyAlive() && areEnemiesAlive() && !flee){
         playerTurn();
 
-        if(!areEnemiesAlive()){
+        if(flee || !areEnemiesAlive()){
             break;
         }
 
         enemyTurn();
     }
-    return isPartyAlive();
+    return !flee & isPartyAlive();
 }

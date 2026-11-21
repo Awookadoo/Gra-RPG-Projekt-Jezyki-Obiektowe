@@ -21,7 +21,7 @@ Game::~Game() {
     currentParty.clear();
 }
 
-//start programu ------------------------------------------------------------------------------------------
+//start programu
 void Game::run(){
     cout << "Welcome to - 'Just a little project'\n" <<
             "Press Enter to start...\n";
@@ -48,7 +48,7 @@ void Game::mainMenu(){
         char choice; cin >> choice;
         clearInput();
         clear();
-        //wybory w menu ------------------------------------------------------------------------------------------
+        //wybory w menu
         while (choice < '0' || choice > '5'){
             clearInput();
             cout << "Invalid option, try again. \n \n";
@@ -66,7 +66,7 @@ void Game::mainMenu(){
             pause();
             startGame();
         }
-        //kreator postaci ------------------------------------------------------------------------------------------
+        //kreator postaci
         else if (choice == '2'){
             Character* postac = Character::createCharacter();
             party.push_back(postac);
@@ -75,16 +75,16 @@ void Game::mainMenu(){
             pause();
             clear();
         }
-        //zarządzanie drużyną ------------------------------------------------------------------------------------------
+        //zarządzanie drużyną
         else if (choice == '3'){
             manageParty();
             pause();
         }
-        //wyjście z programu ------------------------------------------------------------------------------------------
+        //wyjście z programu
         else if (choice == '0'){
             running = false;
         }
-        //przykładowe postacie ------------------------------------------------------------------------------------------
+        //przykładowe postacie
         else if (choice == '4'){
             addCharacter(new Warrior("One"));
             addCharacter(new Mage("Two"));
@@ -92,7 +92,7 @@ void Game::mainMenu(){
             addCharacter(new Warrior("Four"));
             addCharacter(new Warrior("Five"));
         }
-        //dodanie przykładowych do party ------------------------------------------------------------------------------------------
+        //dodanie przykładowych do party
         else if (choice == '5'){
             party[0]->setInParty(true);
             party[1]->setInParty(true);
@@ -114,7 +114,7 @@ int Game::currentPartyCount() const{
     return count;
 }
 
-//zarządzanie posiadanymi postaciami ------------------------------------------------------------------------------------------
+//zarządzanie posiadanymi postaciami
 void Game::manageParty(){
     while(true) {
         clear();
@@ -124,7 +124,7 @@ void Game::manageParty(){
             return;
         }
 
-        //wyświetlanie stworzonych postaci ------------------------------------------------------------------------------------------
+        //wyświetlanie stworzonych postaci
         const int colWidth = 28;
         const int rowWidth = 4;
         cout << left;
@@ -168,7 +168,7 @@ void Game::manageParty(){
         cout << "Input 0 to go back to the main menu.\n";
         cout << "Input the number of the character to select it.\n\n";
         
-        //akcje związane z postaciami ------------------------------------------------------------------------------------------
+        //akcje związane z postaciami
         int choice;
         while (true) {
             if (!(cin >> choice)){
@@ -188,7 +188,7 @@ void Game::manageParty(){
             }
         }
 
-        //wyświetlanie wybranej postaci oraz wybór akcji ------------------------------------------------------------------------------------------
+        //wyświetlanie wybranej postaci oraz wybór akcji
         int selectedID = choice - 1;
         Character* selected = party[selectedID];
         clear();
@@ -206,7 +206,7 @@ void Game::manageParty(){
         int action; cin >> action;
         clearInput();
 
-        //dodawanie/usuwanie z drużyny ------------------------------------------------------------------------------------------
+        //dodawanie/usuwanie z drużyny
         if(action==1){
             if(selected->isInParty()){
                 selected->setInParty(false);
@@ -222,7 +222,7 @@ void Game::manageParty(){
             }
             pause();
         }
-        //usuwanie postaci ------------------------------------------------------------------------------------------
+        //usuwanie postaci
         else if(action==2){
             cout << "Are you sure you want to delete " << selected->getName() << "? (y/n) ";
             char confirm; cin >> confirm;
@@ -262,6 +262,7 @@ void Game::startGame(){
         Combat battle(combatParty, enemies);
         survived = battle.startCombat();
         if(survived){
+            clear();
             cout << "\nWave " << wave << " cleared!\n";
             // for (Character* hero : combatParty) {
             //     if (hero->isAlive()) {
@@ -288,7 +289,7 @@ vector<Monster*> Game::monsterWave(int wave) {
 
     if (loopWave == 0){
         enemies.push_back(new Goblin());
-        enemies.push_back(new Skeleton());
+        enemies.push_back(new Boss());
         enemies.push_back(new Goblin());
     } 
     else {
@@ -304,7 +305,7 @@ vector<Monster*> Game::monsterWave(int wave) {
         }
 
         //lista potworów
-        enum MonsterType {GOBLIN, SKELETON};
+        enum MonsterType {GOBLIN, SKELETON, BOSS};
         vector<MonsterType> pool;
 
         if (loop == 0){
@@ -322,6 +323,9 @@ vector<Monster*> Game::monsterWave(int wave) {
             }
             else if (chosen == SKELETON){
                 enemies.push_back(new Skeleton());
+            }
+            else if (chosen == BOSS){
+                enemies.push_back(new Boss());
             }
         }
     }

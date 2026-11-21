@@ -16,6 +16,9 @@ private:
     vector<Monster*> enemies;
 
     void displayParty() const;
+    void displayEnemies() const;
+    void displayBattlefield() const;
+
     void playerTurn();
     void enemyTurn();
     bool isPartyAlive() const;

@@ -28,3 +28,10 @@ protected:
 public:
     Skeleton();
 };
+
+class Boss : public Monster{
+protected:
+    void attackTarget(Character* target) override;
+public:
+    Boss();
+};

@@ -84,7 +84,7 @@ void Character::displayStats(ostream& os) const {
        << "Defense: " << defense << "\n \n";
 }
 
-//funkcja do wyświetlania statystyk postaci (przeciążenie operatora <<) ------------------------------------------------------------------------------------------
+//funkcja do wyświetlania statystyk postaci (przeciążenie operatora <<)
 ostream& operator<<(ostream& os, const Character& character) {
     character.displayStats(os);
     return os;
