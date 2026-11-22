@@ -11,22 +11,24 @@ using namespace std;
 
 
 class Combat {
-private:
-    vector<Character*>& activeParty;
-    vector<Monster*> enemies;
+    private:
+        vector<Character*>& activeParty;
+        vector<Monster*> enemies;
 
-    void displayParty() const;
-    void displayEnemies() const;
-    void displayBattlefield() const;
+        void displayParty(Character* hasTurn) const;
+        void displayEnemies(Character* hasTurn) const;
+        void displayBattlefield(Character* hasTurn) const;
 
-    void playerTurn();
-    void enemyTurn();
-    bool isPartyAlive() const;
-    bool areEnemiesAlive() const;
-    bool flee = false;
+        void playerTurn();
+        void enemyTurn();
+        bool isPartyAlive() const;
+        bool areEnemiesAlive() const;
+        bool flee = false;
+        int wave;
 
-public:
-    Combat(vector<Character*>& activeParty, vector<Monster*>& enemies);
-    ~Combat();
-    bool startCombat();
+    public:
+        //Combat(vector<Character*>& activeParty, vector<Monster*>& enemies);
+        Combat(vector<Character*>& activeParty, vector<Monster*>& enemies, int currentWave);
+        ~Combat();
+        bool startCombat();
 };

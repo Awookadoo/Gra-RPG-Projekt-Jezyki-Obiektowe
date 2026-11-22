@@ -6,32 +6,40 @@
 using namespace std;
 
 class Monster : public Character{
-protected:
-    virtual void attackTarget(Character* target) = 0;
+    protected:
+        virtual void attackTarget(Character* target) = 0;
 
-public:
-    Monster(string name, int attack, int maxHealth, int defense);
-    void takeTurn(vector<Character*>& playerParty);
-    void statUp(int loop);
+    public:
+        Monster(string name, int attack, int maxHealth, int defense);
+        virtual void takeTurn(vector<Character*>& playerParty);
+        void statUp(int loop);
 };
 
 class Goblin : public Monster{
-protected:
-    void attackTarget(Character* target) override;
-public:
-    Goblin();
+    protected:
+        void attackTarget(Character* target) override;
+    public:
+        Goblin();
 };
 
 class Skeleton : public Monster{
-protected:
-    void attackTarget(Character* target) override;
-public:
-    Skeleton();
+    protected:
+        void attackTarget(Character* target) override;
+    public:
+        Skeleton();
 };
 
-class Boss : public Monster{
-protected:
-    void attackTarget(Character* target) override;
-public:
-    Boss();
+class Slime : public Monster{
+    protected:
+        void attackTarget(Character* target) override;
+    public:
+        Slime();
+};
+
+class Ghoul : public Monster{
+    protected:
+        void attackTarget(Character* target) override;
+        //void takeTurn(vector<Character*>& playerParty) override;
+    public:
+        Ghoul();
 };

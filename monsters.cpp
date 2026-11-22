@@ -34,7 +34,12 @@ void Monster::takeTurn(vector<Character*>& playerParty){
     int randomAttack = rand() % aliveCharacters.size();
     Character* target = aliveCharacters[randomAttack];
 
-    //atakowanie
+    int roll = rand() % 100;
+    if (roll < target->getEvasion()) {
+        cout << "\n" << target->getName() << " dodges the attack from " << name << "!\n";
+        return;
+    }
+
     attackTarget(target);
     if (!target->isAlive()) {
         cout << target->getName() << " has fallen!\n";}
@@ -56,24 +61,83 @@ Goblin::Goblin() : Monster("Goblin", 10, 30, 2) {}
 
 void Goblin::attackTarget(Character* target) {
     int dmg = attack - target->getTrueDEF();
-    cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
+    cout << "\n" << name << " stabbed " << target->getName() << " for " << dmg << " damage!\n";
     target->takeDamage(dmg);
 }
 
-Skeleton::Skeleton() : Monster("Skeleton", 15, 25, 2) {}
+Skeleton::Skeleton() : Monster("Skeleton", 13, 25, 4) {}
 
 void Skeleton::attackTarget(Character* target) {
-    //int specialAttack = target->getDefense() / 2; piercing 50% armor
+    int specialAttack = rand() % 100;
+    if (specialAttack < 25){
+        int dmg = attack - 0.5*target->getTrueDEF();
+        cout << "\n" << name << " shot " << target->getName() << " and dealt " << dmg << " while piercing through half of their DEF!\n";
+        target->takeDamage(dmg);
+        target->applyStun();
+    }
+    else{
+        int dmg = attack - target->getTrueDEF();
+        cout << "\n" << name << " shot " << target->getName() << " and dealt " << dmg << " damage!\n";
+        target->takeDamage(dmg);
+    }
+}
+
+Slime::Slime() : Monster("Slime", 8, 30, 4) {}
+
+void Slime::attackTarget(Character* target) {
+    int specialAttack = rand() % 100;
+    if (specialAttack < 40){
+        int dmg = attack - target->getTrueDEF();
+        cout << "\n" << name << " oozed over " << target->getName() << " to deal " << dmg << " damage and stun them for the next turn!\n";
+        target->takeDamage(dmg);
+        target->applyStun();
+    }
+    else{
+        int dmg = attack - target->getTrueDEF();
+        cout << "\n" << name << " oozed over " << target->getName() << " to deal " << dmg << " damage!\n";
+        target->takeDamage(dmg);
+    }
+}
+
+Ghoul::Ghoul() : Monster("Ghoul", 11, 40, 6) {}
+
+void Ghoul::attackTarget(Character* target) {
     int dmg = attack - target->getTrueDEF();
     cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
     target->takeDamage(dmg);
 }
 
-Boss::Boss() : Monster("Boss", 12, 40, 5) {}
 
-void Boss::attackTarget(Character* target) {
-    //int specialAttack = target->getDefense() / 2; piercing 50% armor
-    int dmg = attack - target->getTrueDEF();
-    cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
-    target->takeDamage(dmg);
-}
+
+
+// void Ghoul::takeTurn(vector<Character*>& playerParty){
+//     //szukanie focusing
+//     for (Character* hero : playerParty) {
+//         if (hero->isAlive() && hero->isFocusing()) {
+//             attackTarget(hero);
+//             return;
+//         }
+//     }
+//     //szukanie żywych postaci
+//     vector<Character*> aliveCharacters;
+//     for (Character* hero : playerParty){
+//         if (hero->isAlive()){
+//             hero->takeDamage(8);
+//             cout << "\n" << name << " "
+//         }
+//     }
+   
+//     //wybieranie losowej postaci do ataku
+//     int randomAttack = rand() % aliveCharacters.size();
+//     Character* target = aliveCharacters[randomAttack];
+
+//     int roll = rand() % 100;
+//     if (roll < target->getEvasion()) {
+//         cout << "\n" << target->getName() << " dodges the attack from " << name << "!\n";
+//         return;
+//     }
+
+//     attackTarget(target);
+//     if (!target->isAlive()) {
+//         cout << target->getName() << " has fallen!\n";}
+// }

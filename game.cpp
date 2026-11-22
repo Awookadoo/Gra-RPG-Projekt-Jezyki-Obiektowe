@@ -37,7 +37,7 @@ void Game::displayMainMenu() const{
                 "Input 2 to start the character creator.\n" <<
                 "Input 3 to manage your current party.\n" <<
                 "Input 4 to add example characters.\n" <<
-                "Input 5 to add example characters to party.\n" <<
+                "Input 5 to add example characters & add them to party.\n" <<
                 "Input 0 to exit the program.\n \n";
 }
 
@@ -90,14 +90,17 @@ void Game::mainMenu(){
         }
         //przykładowe postacie
         else if (choice == '4'){
-            addCharacter(new Warrior("One"));
-            addCharacter(new Mage("Two"));
-            addCharacter(new Assassin("Three"));
+            addCharacter(new Warrior("John"));
+            addCharacter(new Mage("Kai"));
+            addCharacter(new Assassin("Mare"));
             addCharacter(new Warrior("Four"));
             addCharacter(new Warrior("Five"));
         }
         //dodanie przykładowych do party
         else if (choice == '5'){
+            addCharacter(new Warrior("Onir"));
+            addCharacter(new Mage("Twon"));
+            addCharacter(new Assassin("Thrista"));
             party[0]->setInParty(true);
             party[1]->setInParty(true);
             party[2]->setInParty(true);
@@ -263,12 +266,12 @@ void Game::startGame(){
         pause();
         vector<Monster*> enemies = monsterWave(wave);
 
-        Combat battle(combatParty, enemies);
+        Combat battle(combatParty, enemies, wave);
         survived = battle.startCombat();
         if(survived){
             clear();
             cout << "-----------------------------\n" <<
-                    "\nWave " << wave << " cleared!\n" <<
+                    "WAVE " << wave << " cleared!\n" <<
                     "-----------------------------\n";
             wave++;
             pause();
@@ -289,9 +292,9 @@ vector<Monster*> Game::monsterWave(int wave) {
     int loopWave = wave %5;
 
     if (loopWave == 0){
-        enemies.push_back(new Goblin());
-        enemies.push_back(new Boss());
-        enemies.push_back(new Goblin());
+        enemies.push_back(new Slime());
+        enemies.push_back(new Slime());
+        enemies.push_back(new Slime());
     } 
     else {
         int count = 0;
@@ -306,15 +309,15 @@ vector<Monster*> Game::monsterWave(int wave) {
         }
 
         //lista potworów
-        enum MonsterType {GOBLIN, SKELETON, BOSS};
+        enum MonsterType {GOBLIN, SKELETON, SLIME};
         vector<MonsterType> pool;
 
         if (loop == 0){
-            pool = { GOBLIN, GOBLIN, GOBLIN, SKELETON };
+            pool = { GOBLIN, GOBLIN, GOBLIN, SKELETON, SLIME};
         } else if (loop == 1) {
-            pool = { GOBLIN, SKELETON };
+            pool = { GOBLIN, SKELETON, SLIME };
         } else {
-            pool = { GOBLIN, SKELETON, SKELETON, SKELETON };
+            pool = { GOBLIN, SKELETON, SKELETON, SLIME, SLIME };
         }
 
         for (int i = 0; i < count; i++){
@@ -325,8 +328,8 @@ vector<Monster*> Game::monsterWave(int wave) {
             else if (chosen == SKELETON){
                 enemies.push_back(new Skeleton());
             }
-            else if (chosen == BOSS){
-                enemies.push_back(new Boss());
+            else if (chosen == SLIME){
+                enemies.push_back(new Slime());
             }
         }
     }

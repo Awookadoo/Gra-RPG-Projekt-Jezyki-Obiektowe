@@ -20,6 +20,10 @@ class Character {
 
         bool guarding = false;
         bool focusing = false;
+        bool stunned = false;
+
+        int overDamage = 0;
+        int overTurns = 0;
 
     public:
         Character(string name, int attack = 10, int maxHealth = 50, int maxMana = 10, int defense = 5);
@@ -63,15 +67,26 @@ class Character {
 
         //skills
         virtual void onTurnStart() {}
-        virtual void onTurnEnd() {}
         virtual void onWaveStart() {}
         virtual void showSkills() const{}
         virtual bool useSkill(int actionSkill, vector<Character*>& activeParty, vector<Monster*>& enemies) {return false;}
+        bool spendMana(int manaCost);
 
         void focus(){focusing = true;}
         void resetFocus(){focusing = false;}
         bool isFocusing() const {return focusing;}
-};
+        
+        void getOverDamage(int dmgPerTurn, int turns);
+        void applyOverDamage();
+
+        void applyStun() {stunned = true; }
+        bool isStunned() const {return stunned; }
+        void clearStun() {stunned = false; }
+
+        void reduceDefense();
+
+        virtual int getEvasion() const {return 0;}
+        };
 
 //------------------------------Class Stuff------------------------------
 
@@ -80,7 +95,7 @@ class Warrior : public Character {
         int rage;
 
     public:
-        Warrior(string name, int rage = 0);
+        Warrior(string name, int rage = -1);
         void classDescription();
         void displayStats(ostream& os) const override;
         string getClassName() const override {return "Warrior";}
@@ -98,11 +113,12 @@ class Mage : public Character {
         int manaRegen;
 
     public:
-        Mage(string name, int manaRegen = 0);
+        Mage(string name, int manaRegen = 2);
         void classDescription();
         void displayStats(ostream& os) const override;
         string getClassName() const override {return "Mage";}
         
+        void onTurnStart() override;
         void showSkills() const override;
         bool useSkill(int actionSkill, vector<Character*>& activeParty, vector<Monster*>& enemies) override;
 };
@@ -112,11 +128,14 @@ class Assassin : public Character {
         int evasion;
         
     public:
-        Assassin(string name, int evasion = 0);
+        Assassin(string name, int evasion = 25);
         void classDescription();
         void displayStats(ostream& os) const override;
         string getClassName() const override {return "Assassin";}
         
+        int getEvasion() const override;
+        void onTurnStart() override;
+        void onWaveStart() override;
         void showSkills() const override;
         bool useSkill(int actionSkill, vector<Character*>& activeParty, vector<Monster*>& enemies) override;
 };
