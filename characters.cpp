@@ -54,7 +54,7 @@ Character* Character::createCharacter() {
             continue;
         }
 
-        if (classChoice >= 1 && classChoice <= 3) {
+        if (classChoice >= 1 && classChoice <= 5) {
             clear();
             if (classChoice == 1) {
                 Warrior tempWarrior(name);
