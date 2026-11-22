@@ -90,11 +90,11 @@ void Game::mainMenu(){
         }
         //przykładowe postacie
         else if (choice == '4'){
-            addCharacter(new Warrior("John"));
+            addCharacter(new Warrior("Adam"));
             addCharacter(new Mage("Kai"));
             addCharacter(new Assassin("Mare"));
-            addCharacter(new Warrior("Four"));
-            addCharacter(new Warrior("Five"));
+            addCharacter(new Cleric("Elizabeth"));
+            addCharacter(new Reaper("Johann"));
         }
         //dodanie przykładowych do party
         else if (choice == '5'){
@@ -133,7 +133,7 @@ void Game::manageParty(){
 
         //wyświetlanie stworzonych postaci
         const int colWidth = 28;
-        const int rowWidth = 4;
+        const int rowWidth = 3;
         cout << left;
 
         for (int start = 0; start < party.size(); start += rowWidth){
@@ -271,7 +271,7 @@ void Game::startGame(){
         if(survived){
             clear();
             cout << "-----------------------------\n" <<
-                    "WAVE " << wave << " cleared!\n" <<
+                    "       WAVE " << wave << " CLEARED!\n" <<
                     "-----------------------------\n";
             wave++;
             pause();
@@ -309,15 +309,17 @@ vector<Monster*> Game::monsterWave(int wave) {
         }
 
         //lista potworów
-        enum MonsterType {GOBLIN, SKELETON, SLIME};
+        enum MonsterType {GOBLIN, SKELETON, SLIME, GHOUL, RAT};
         vector<MonsterType> pool;
 
         if (loop == 0){
-            pool = { GOBLIN, GOBLIN, GOBLIN, SKELETON, SLIME};
+            pool = {GOBLIN, GOBLIN, GOBLIN, SKELETON, SLIME};
         } else if (loop == 1) {
-            pool = { GOBLIN, SKELETON, SLIME };
-        } else {
-            pool = { GOBLIN, SKELETON, SKELETON, SLIME, SLIME };
+            pool = {GOBLIN, GOBLIN, SKELETON, SKELETON, SLIME, SLIME, GHOUL};
+        } else if (loop == 2) {
+            pool = {GOBLIN, SKELETON, SLIME, GHOUL, RAT};
+        } else{
+            pool = {GOBLIN, SKELETON, SLIME, GHOUL, RAT, SKELETON, SLIME, GHOUL, GHOUL, RAT};
         }
 
         for (int i = 0; i < count; i++){
@@ -330,6 +332,12 @@ vector<Monster*> Game::monsterWave(int wave) {
             }
             else if (chosen == SLIME){
                 enemies.push_back(new Slime());
+            }
+            else if (chosen == GHOUL){
+                enemies.push_back(new Ghoul());
+            }
+            else if (chosen == RAT){
+                enemies.push_back(new Rat());
             }
         }
     }

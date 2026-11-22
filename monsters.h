@@ -43,3 +43,11 @@ class Ghoul : public Monster{
     public:
         Ghoul();
 };
+
+class Rat : public Monster{
+    protected:
+        void attackTarget(Character* target) override;
+        //void takeTurn(vector<Character*>& playerParty) override;
+    public:
+        Rat();
+};

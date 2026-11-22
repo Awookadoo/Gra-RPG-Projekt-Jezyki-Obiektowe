@@ -73,7 +73,6 @@ void Skeleton::attackTarget(Character* target) {
         int dmg = attack - 0.5*target->getTrueDEF();
         cout << "\n" << name << " shot " << target->getName() << " and dealt " << dmg << " while piercing through half of their DEF!\n";
         target->takeDamage(dmg);
-        target->applyStun();
     }
     else{
         int dmg = attack - target->getTrueDEF();
@@ -99,45 +98,34 @@ void Slime::attackTarget(Character* target) {
     }
 }
 
-Ghoul::Ghoul() : Monster("Ghoul", 11, 40, 6) {}
+Ghoul::Ghoul() : Monster("Ghoul", 15, 40, 10) {}
 
 void Ghoul::attackTarget(Character* target) {
-    int dmg = attack - target->getTrueDEF();
-    cout << "\n" << name << " attacked " << target->getName() << " for " << dmg << " damage!\n";
-    target->takeDamage(dmg);
+    int specialAttack = rand() % 100;
+    if (specialAttack < 50){
+        int dmg = attack - target->getTrueDEF();
+        cout << "\n" << name << " bit " << target->getName() << " and dealt " << dmg << " healing himself for 5 health!\n";
+        target->takeDamage(dmg);
+        restoreHealth(5);
+    }
+    else{
+        int dmg = attack - target->getTrueDEF();
+        cout << "\n" << name << " bit " << target->getName() << " and dealt " << dmg << " damage!\n";
+        target->takeDamage(dmg);
+    }
 }
 
+Rat::Rat() : Monster("Rat", 1, 1, 0) {}
 
-
-
-// void Ghoul::takeTurn(vector<Character*>& playerParty){
-//     //szukanie focusing
-//     for (Character* hero : playerParty) {
-//         if (hero->isAlive() && hero->isFocusing()) {
-//             attackTarget(hero);
-//             return;
-//         }
-//     }
-//     //szukanie żywych postaci
-//     vector<Character*> aliveCharacters;
-//     for (Character* hero : playerParty){
-//         if (hero->isAlive()){
-//             hero->takeDamage(8);
-//             cout << "\n" << name << " "
-//         }
-//     }
-   
-//     //wybieranie losowej postaci do ataku
-//     int randomAttack = rand() % aliveCharacters.size();
-//     Character* target = aliveCharacters[randomAttack];
-
-//     int roll = rand() % 100;
-//     if (roll < target->getEvasion()) {
-//         cout << "\n" << target->getName() << " dodges the attack from " << name << "!\n";
-//         return;
-//     }
-
-//     attackTarget(target);
-//     if (!target->isAlive()) {
-//         cout << target->getName() << " has fallen!\n";}
-// }
+void Rat::attackTarget(Character* target) {
+    int specialAttack = rand() % 100;
+    if (specialAttack < 80){
+        int dmg = target->getHealth();
+        cout << "\n" << name << " infected " << target->getName() << " with rabies.\n";
+        target->takeDamage(dmg);
+        target->applyStun();
+    }
+    else{
+        cout << "\n" << name << " was friendly :)\n";
+    }
+}

@@ -25,6 +25,8 @@ class Character {
         int overDamage = 0;
         int overTurns = 0;
 
+        int bonusDefense = 0;
+
     public:
         Character(string name, int attack = 10, int maxHealth = 50, int maxMana = 10, int defense = 5);
         virtual ~Character();
@@ -40,7 +42,7 @@ class Character {
         int getHealth() const {return currentHealth;}
         int getMaxHealth() const {return maxHealth;}
         virtual int getAttack() const {return attack;}
-        int getDefense() const {return defense;}
+        int getDefense() const {return defense + bonusDefense;}
         int getMaxMana() const {return maxMana;}
         int getMana() const {return currentMana;}
         bool isAlive() const {return currentHealth > 0;}
@@ -51,12 +53,13 @@ class Character {
         //stat changers
         void takeDamage(int dmg);
         void restoreHealth(int amountHealth);
+        void setHealth(int amountHealth);
         void restoreMana(int amountMana);
         void restore();
 
         //basic actions
         Monster* selectTarget(const vector<Monster*>& enemies) const;
-        void basicAttack(Character* target);
+        virtual void basicAttack(Character* target);
         void heal();
         void wait();
 
@@ -83,9 +86,16 @@ class Character {
         bool isStunned() const {return stunned; }
         void clearStun() {stunned = false; }
 
-        void reduceDefense();
+        void halfDefense();
 
         virtual int getEvasion() const {return 0;}
+
+        void addBonusDefense(int amount) {bonusDefense += amount;}
+        void resetBonusDefense() {bonusDefense = 0;}
+        Character* selectAlly(const vector<Character*>& activeParty) const;
+
+        bool spendHealth(int healthCost);
+        void reduceDefense(int amount);
         };
 
 //------------------------------Class Stuff------------------------------
@@ -136,6 +146,37 @@ class Assassin : public Character {
         int getEvasion() const override;
         void onTurnStart() override;
         void onWaveStart() override;
+        void showSkills() const override;
+        bool useSkill(int actionSkill, vector<Character*>& activeParty, vector<Monster*>& enemies) override;
+};
+
+class Cleric : public Character {
+    protected:
+        int divinePower;
+        
+    public:
+        Cleric(string name, int divinePower = 2);
+        void classDescription();
+        void displayStats(ostream& os) const override;
+        string getClassName() const override {return "Cleric";}
+        
+        void onWaveStart() override;
+        void showSkills() const override;
+        bool useSkill(int actionSkill, vector<Character*>& activeParty, vector<Monster*>& enemies) override;
+};
+
+class Reaper : public Character {
+    protected:
+        int lifeSteal;
+        
+    public:
+        Reaper(string name, int lifeSteal = 0);
+        void classDescription();
+        void displayStats(ostream& os) const override;
+        string getClassName() const override {return "Reaper";}
+        
+        void onTurnStart() override;
+        void basicAttack(Character* target) override;
         void showSkills() const override;
         bool useSkill(int actionSkill, vector<Character*>& activeParty, vector<Monster*>& enemies) override;
 };

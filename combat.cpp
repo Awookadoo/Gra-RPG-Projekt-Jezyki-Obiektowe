@@ -21,7 +21,7 @@ Combat::~Combat() {
 //wyświetlanie drużyny ------------------------------------------------------------------------------------------
 void Combat::displayParty(Character* hasTurn) const{
     const int colWidth = 28;
-    int count = 3;
+    int count = activeParty.size();
     cout << left;
 
     //rząd 1 - nazwa postaci
@@ -146,8 +146,8 @@ void Combat::playerTurn(){
                     cout << "\nChoose action:\n" <<
                         "1. Attack -> Deal damage to an enemy. [ATK-DEF]\n" <<
                         "2. Guard -> Negate all damage until the next turn.\n" <<
-                        "3. Heal -> Heal yourself for 5 HP.\n" <<
-                        "4. Wait -> Gain back two more mana.\n" <<
+                        "3. Heal -> Heal yourself for 10 HP.\n" <<
+                        "4. Wait -> Skip your turn.\n" <<
                         "0. Cancel.\n\n";
                     char actionBasic; cin >> actionBasic;
                     clearInput();
@@ -263,6 +263,10 @@ bool Combat::areEnemiesAlive() const{
 
 //rozpoczęcie walki
 bool Combat::startCombat(){
+    for (Character* hero : activeParty){
+        hero->onWaveStart();
+    }
+    
     while(isPartyAlive() && areEnemiesAlive() && !flee){
         playerTurn();
 
