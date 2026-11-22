@@ -141,10 +141,15 @@ void Character::restore(){
     currentMana = maxMana;
 }
 
+int Character::calculateDamage(double attack_, double defense_) {
+    double damage = attack_ - defense_;
+    return (damage > 1.0) ? damage : 1;
+}
+
 //------------------------------Basic Actions------------------------------
 
 void Character::basicAttack(Character* target){
-    int dmg = getAttack() - target->getDefense();
+    int dmg = calculateDamage(getAttack(), target->getDefense());
     target->takeDamage(dmg);
 
     cout << "\n" << name << " hits " << target->getName() << " for " << dmg << " damage!\n";
@@ -159,16 +164,16 @@ void Character::guard(){
 }
 
 int Character::getTrueDEF() const{
-    return focusing ? defense + 2 : defense;
+    return getDefense();
 }
 
 void Character::heal(){
-    restoreHealth(10);
-    cout << "\n" << name << " has healed themselves 10 HP.\n";
+    restoreHealth(8);
+    cout << "\n" << name << " has healed themselves 8 HP.\n";
 }
 
 void Character::wait(){
-    cout << "\n" << name << " skipped his turn.\n";
+    cout << "\n" << name << " skipped their turn.\n";
 }
 
 Monster* Character::selectTarget(const vector<Monster*>& enemies) const{
@@ -305,7 +310,7 @@ bool Warrior::useSkill(int actionSkill, vector<Character*>& activeParty, vector<
     if (actionSkill == 1){
         if (!spendMana(3)) return false;
         Monster* target = selectTarget(enemies);
-        int dmg = (getAttack() * 1.5) - target->getDefense();
+        int dmg = calculateDamage(getAttack() * 1.5, target->getDefense());
         target->takeDamage(dmg);
         cout << "\n" << name << " uses Heavy Attack on " << target->getName() << " for " << dmg << " damage!\n";
         return true;
@@ -481,7 +486,7 @@ bool Assassin::useSkill(int actionSkill, vector<Character*>& activeParty, vector
 
 //------------------------------Cleric Stuff------------------------------
 
-Cleric::Cleric(string name_, int divinePower_) : Character(name_, 8, 30, 10, 8){
+Cleric::Cleric(string name_, int divinePower_) : Character(name_, 7, 30, 9, 5){
     divinePower = divinePower_;
 }
 
@@ -495,10 +500,10 @@ void Cleric::classDescription(){
     cout << "Cleric: Adds a unique stat called Divine Power. \n" <<
             "Divine power increases the effectivness of your skill boosts.\n" <<
             "Resets every wave.\n\n" <<
-            "Attack: 8 \n" <<
+            "Attack: 7 \n" <<
             "Health: 30 \n" <<
-            "Mana: 10 \n" <<
-            "Defense: 8 \n \n" <<
+            "Mana: 9 \n" <<
+            "Defense: 5 \n \n" <<
             "Skills: \n" <<
             "1. Team Heal (Cost: 3 Mana) -> Heal your entire team for 6 [+" << divinePower << "] health.\n" <<
             "2. Holy Barrier (Cost: 5 Mana) -> Increases the DEF of the chosen party member by " << divinePower << ". [Divine Power]\n" <<
@@ -508,8 +513,8 @@ void Cleric::classDescription(){
 void Cleric::showSkills() const{
     cout << "\n--- Cleric Skills ---\n"
          << "Passive. Divine power increases the effectivness of your skill boosts - resets back to 2 every wave.\n\n"
-         << "1. Team Heal (Cost: 3 Mana) -> Heal your entire team for 6 [+" << divinePower << "] health.\n"
-         << "2. Holy Barrier (Cost: 5 Mana) -> Increases the DEF of the chosen party member by " << divinePower << " [Divine Power] permanently.\n"
+         << "1. Team Heal (Cost: 3 Mana) -> Heal your entire team for 6 [+" << divinePower << " divine power] health.\n"
+         << "2. Holy Barrier (Cost: 6 Mana) -> Increases the DEF of the chosen party member by " << divinePower << " [Divine Power] permanently.\n"
          << "3. Pray (Cost: 2 Mana) -> Divine Power increases by 1 for the current wave.\n"
          << "0. Cancel.\n\n"
          << "Choose skill: ";
@@ -551,7 +556,7 @@ bool Cleric::useSkill(int actionSkill, vector<Character*>& activeParty, vector<M
 
 //------------------------------Reaper Stuff------------------------------
 
-Reaper::Reaper(string name_, int lifeSteal_) : Character(name_, 9, 35, 10, 3){
+Reaper::Reaper(string name_, int lifeSteal_) : Character(name_, 9, 35, 10, 2){
     lifeSteal = lifeSteal_;
 }
 
@@ -568,19 +573,23 @@ void Reaper::classDescription(){
             "Attack: 9 \n" <<
             "Health: 35 \n" <<
             "Mana: 10 \n" <<
-            "Defense: 3 \n \n" <<
+            "Defense: 2 \n \n" <<
             "Skills: \n" <<
             "1. Death Bomb (Cost: 5 Health) -> Deal 6 damage to every enemy and gain 2 life steal points.\n" <<
             "2. Drain Blade (Cost: 2 Health) -> Deal 3 damage to an enemy, reduce their DEF by 2 and gain 1 life steal point.\n" <<
-            "3. Life Swap (Cost: 7 Mana) -> Swap the amount of health with an enemy (health cannot exceed maximum).\n\n";
+            "3. Life Swap (Cost: 8 Mana) -> Swap the amount of health with an enemy (health cannot exceed maximum).\n\n";
 }
 
 void Reaper::basicAttack(Character* target) {
+    int healthBeforeAttack = target->getHealth();
     Character::basicAttack(target);
-    if (lifeSteal > 0) {
-        restoreHealth(lifeSteal);
-        cout << name << " stole " << lifeSteal << " HP from the 9 damage attack!\n";
+    int damageDealt = healthBeforeAttack - target->getHealth();
+    int healthStolen = (lifeSteal < damageDealt) ? lifeSteal : damageDealt;
+    if (healthStolen > 0) {
+        restoreHealth(healthStolen);
+        cout << name << " stole " << healthStolen << " HP from the attack!\n";
     }
+    lifeSteal = 0;
 }
 
 void Reaper::onTurnStart(){
@@ -592,7 +601,7 @@ void Reaper::showSkills() const{
          << "Passive. Every turn gain one life steal point, healing you each for 1 HP on basic attack.\n\n"
          << "1. Death Bomb (Cost: 5 Health) -> Deal 6 damage to every enemy and gain 2 life steal points.\n"
          << "2. Drain Blade (Cost: 2 Health) -> Deal 3 damage to an enemy, reduce their DEF by 2 and gain 1 life steal point.\n"
-         << "3. Life Swap (Cost: 10 Mana) -> Swap the amount of health with an enemy (health cannot exceed maximum).\n"
+         << "3. Life Swap (Cost: 8 Mana) -> Swap the amount of health with an enemy (health cannot exceed maximum).\n"
          << "0. Cancel.\n\n"
          << "Choose skill: ";
 }
@@ -618,7 +627,7 @@ bool Reaper::useSkill(int actionSkill, vector<Character*>& activeParty, vector<M
         return true;
     }
     else if (actionSkill == 3){
-        if (!spendMana(7)) return false;
+        if (!spendMana(8)) return false;
         Monster* target = selectTarget(enemies);
         int tmpHealth = target->getHealth();
         target->setHealth(getHealth());

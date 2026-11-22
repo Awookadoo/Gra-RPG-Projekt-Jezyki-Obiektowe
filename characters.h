@@ -42,7 +42,7 @@ class Character {
         int getHealth() const {return currentHealth;}
         int getMaxHealth() const {return maxHealth;}
         virtual int getAttack() const {return attack;}
-        int getDefense() const {return defense + bonusDefense;}
+        int getDefense() const {return defense + bonusDefense + (focusing ? 5 : 0);}
         int getMaxMana() const {return maxMana;}
         int getMana() const {return currentMana;}
         bool isAlive() const {return currentHealth > 0;}
@@ -56,6 +56,7 @@ class Character {
         void setHealth(int amountHealth);
         void restoreMana(int amountMana);
         void restore();
+        static int calculateDamage(double attack, double defense);
 
         //basic actions
         Monster* selectTarget(const vector<Monster*>& enemies) const;

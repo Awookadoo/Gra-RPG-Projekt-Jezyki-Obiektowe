@@ -60,7 +60,7 @@ void Monster::statUp(int loop){
 Goblin::Goblin() : Monster("Goblin", 10, 30, 2) {}
 
 void Goblin::attackTarget(Character* target) {
-    int dmg = attack - target->getTrueDEF();
+    int dmg = Character::calculateDamage(attack, target->getTrueDEF());
     cout << "\n" << name << " stabbed " << target->getName() << " for " << dmg << " damage!\n";
     target->takeDamage(dmg);
 }
@@ -70,12 +70,12 @@ Skeleton::Skeleton() : Monster("Skeleton", 13, 25, 4) {}
 void Skeleton::attackTarget(Character* target) {
     int specialAttack = rand() % 100;
     if (specialAttack < 25){
-        int dmg = attack - 0.5*target->getTrueDEF();
+        int dmg = Character::calculateDamage(attack, target->getTrueDEF() * 0.5);
         cout << "\n" << name << " shot " << target->getName() << " and dealt " << dmg << " while piercing through half of their DEF!\n";
         target->takeDamage(dmg);
     }
     else{
-        int dmg = attack - target->getTrueDEF();
+        int dmg = Character::calculateDamage(attack, target->getTrueDEF());
         cout << "\n" << name << " shot " << target->getName() << " and dealt " << dmg << " damage!\n";
         target->takeDamage(dmg);
     }
@@ -86,13 +86,13 @@ Slime::Slime() : Monster("Slime", 8, 30, 4) {}
 void Slime::attackTarget(Character* target) {
     int specialAttack = rand() % 100;
     if (specialAttack < 40){
-        int dmg = attack - target->getTrueDEF();
+        int dmg = Character::calculateDamage(attack, target->getTrueDEF());
         cout << "\n" << name << " oozed over " << target->getName() << " to deal " << dmg << " damage and stun them for the next turn!\n";
         target->takeDamage(dmg);
         target->applyStun();
     }
     else{
-        int dmg = attack - target->getTrueDEF();
+        int dmg = Character::calculateDamage(attack, target->getTrueDEF());
         cout << "\n" << name << " oozed over " << target->getName() << " to deal " << dmg << " damage!\n";
         target->takeDamage(dmg);
     }
@@ -103,13 +103,13 @@ Ghoul::Ghoul() : Monster("Ghoul", 15, 40, 10) {}
 void Ghoul::attackTarget(Character* target) {
     int specialAttack = rand() % 100;
     if (specialAttack < 50){
-        int dmg = attack - target->getTrueDEF();
-        cout << "\n" << name << " bit " << target->getName() << " and dealt " << dmg << " healing himself for 5 health!\n";
+        int dmg = Character::calculateDamage(attack, target->getTrueDEF());
+        cout << "\n" << name << " bit " << target->getName() << " and dealt " << dmg << " while healing himself for 5 health!\n";
         target->takeDamage(dmg);
         restoreHealth(5);
     }
     else{
-        int dmg = attack - target->getTrueDEF();
+        int dmg = Character::calculateDamage(attack, target->getTrueDEF());
         cout << "\n" << name << " bit " << target->getName() << " and dealt " << dmg << " damage!\n";
         target->takeDamage(dmg);
     }

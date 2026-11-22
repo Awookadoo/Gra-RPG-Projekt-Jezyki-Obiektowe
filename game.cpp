@@ -291,10 +291,22 @@ vector<Monster*> Game::monsterWave(int wave) {
     int loop = (wave-1)/5;
     int loopWave = wave %5;
 
-    if (loopWave == 0){
-        enemies.push_back(new Slime());
-        enemies.push_back(new Slime());
-        enemies.push_back(new Slime());
+    if ((loopWave == 0) && (loop == 0)){
+        enemies.push_back(new Goblin());
+        enemies.push_back(new Ghoul());
+        enemies.push_back(new Goblin());
+    } 
+    else if ((loopWave == 0) && (loop == 1)){
+        enemies.push_back(new Rat());
+        enemies.push_back(new Rat());
+        enemies.push_back(new Rat());
+        enemies.push_back(new Rat());
+    } 
+    else if ((loopWave == 0) && (loop == 2)){
+        enemies.push_back(new Ghoul());
+        enemies.push_back(new Ghoul());
+        enemies.push_back(new Ghoul());
+        enemies.push_back(new Ghoul());
     } 
     else {
         int count = 0;
@@ -315,7 +327,7 @@ vector<Monster*> Game::monsterWave(int wave) {
         if (loop == 0){
             pool = {GOBLIN, GOBLIN, GOBLIN, SKELETON, SLIME};
         } else if (loop == 1) {
-            pool = {GOBLIN, GOBLIN, SKELETON, SKELETON, SLIME, SLIME, GHOUL};
+            pool = {GOBLIN, GOBLIN, SKELETON, SKELETON, SLIME, SLIME, GHOUL, RAT};
         } else if (loop == 2) {
             pool = {GOBLIN, SKELETON, SLIME, GHOUL, RAT};
         } else{
