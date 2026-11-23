@@ -211,7 +211,7 @@ void Combat::playerTurn(){
                         cout << "------------------\n \n";
                         Monster* target = hero->selectTarget(enemies);
                         hero->basicAttack(target);
-                        displayBattlefield(hero, false);
+                        displayBattlefield(hero);
                         pause();
                         break;
                     }
@@ -250,7 +250,7 @@ void Combat::playerTurn(){
                         pause();
                         continue;
                     }
-                    displayBattlefield(hero, false);
+                    displayBattlefield(hero);
                     pause();
                     break;
                 }
@@ -294,7 +294,7 @@ void Combat::enemyTurn(){
 
         if (!isPartyAlive()) break;
         enemy->takeTurn(activeParty);
-        displayBattlefield(enemy, false);
+        displayBattlefield(enemy);
         pause();
     }
 }
