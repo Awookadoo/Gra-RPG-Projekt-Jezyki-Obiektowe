@@ -7,6 +7,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
+                "-static",
                 "${fileDirname}\\*.cpp",
                 "-o",
                 "${fileDirname}\\RPGGame.exe"

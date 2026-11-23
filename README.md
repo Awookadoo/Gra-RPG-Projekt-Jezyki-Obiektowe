@@ -34,7 +34,7 @@ To create your own character, enter `2` at the main menu, choose a name and clas
 
 ## Run the precompiled Windows program
 
-The included `RPGGame.exe` is built for 64-bit Windows. Download it and double-click it, or run it from Command Prompt or PowerShell. No compiler is needed to run the executable.
+The included `RPGGame.exe` is built for 64-bit Windows and includes the MinGW C++ runtime, so the recipient does not need to install MSYS2 or copy runtime DLLs. Double-click it, or run it from Command Prompt or PowerShell.
 
 Executables are operating-system and architecture specific. This Windows executable does not run natively on Linux or macOS; compile the source code on those systems using the instructions below.
 
@@ -60,7 +60,7 @@ pacman -S mingw-w64-ucrt-x86_64-gcc
 From the project directory, compile and run:
 
 ```sh
-g++ -std=c++17 *.cpp -o RPGGame.exe
+g++ -std=c++17 -static *.cpp -o RPGGame.exe
 ./RPGGame.exe
 ```
 
