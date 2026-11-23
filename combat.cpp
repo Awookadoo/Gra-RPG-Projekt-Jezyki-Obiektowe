@@ -1,14 +1,48 @@
 #include "characters.h"
 #include "monsters.h"
 #include "utility.h"
-#include "game.h"
 #include "combat.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <iomanip>
-#include <cstdlib>
+#ifdef _WIN32
+#define byte win_byte_override
+#include <windows.h>
+#undef byte
+#endif
 using namespace std;
+
+void displayColorName(const string& text, const Character* character, const Character* hasTurn, int colWidth) {
+    #ifdef _WIN32
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(console, &info);
+    WORD originalColor = info.wAttributes;
+
+    if (character == hasTurn && character->isAlive()) {
+        SetConsoleTextAttribute(console, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+    } else if (character->wasHitThisTurn()) {
+        SetConsoleTextAttribute(console, FOREGROUND_RED | FOREGROUND_INTENSITY);
+    }
+    cout << text;
+    SetConsoleTextAttribute(console, originalColor);
+    #else
+    if (character == hasTurn && character->isAlive()) {
+        cout << "\033[32m";
+    } else if (character->wasHitThisTurn()) {
+        cout << "\033[31m";
+    }
+    cout << text;
+    if ((character == hasTurn && character->isAlive()) || character->wasHitThisTurn()) {
+        cout << "\033[0m";
+    }
+    #endif
+
+    if (text.size() < static_cast<size_t>(colWidth)) {
+        cout << string(colWidth - text.size(), ' ');
+    }
+}
 
 Combat::Combat(vector<Character*>& activeParty, vector<Monster*>& enemies, int currentWave) : activeParty(activeParty), enemies(enemies), wave(currentWave) {}
 
@@ -33,7 +67,7 @@ void Combat::displayParty(Character* hasTurn) const{
             status = " [TURN]";
         }
         string showName = "[" + to_string(i + 1) + "] " + activeParty[i]->getName() + status;
-        cout << setw(colWidth) << showName;
+        displayColorName(showName, activeParty[i], hasTurn, colWidth);
     }
     cout << "\n";
 
@@ -74,7 +108,7 @@ void Combat::displayEnemies(Character* hasTurn) const {
             status = " [TURN]";
         }
         string showName = "[" + to_string(i + 1) + "] " + enemies[i]->getName() + status;
-        cout << setw(colWidth) << showName;
+        displayColorName(showName, enemies[i], hasTurn, colWidth);
     }
     cout << "\n";
 
@@ -94,8 +128,10 @@ void Combat::displayEnemies(Character* hasTurn) const {
 }
 
 //wspólne wyświetlanie
-void Combat::displayBattlefield(Character* hasTurn) const{
-    clear();
+void Combat::displayBattlefield(Character* hasTurn, bool clearScreen) const{
+    if (clearScreen) {
+        clear();
+    }
     cout << "-----------------------------\n" <<
                 "           WAVE " << wave << "\n"
                 "-----------------------------\n\n";
@@ -104,11 +140,21 @@ void Combat::displayBattlefield(Character* hasTurn) const{
     displayEnemies(hasTurn);
 }
 
+void Combat::resetHitStatuses() {
+    for (Character* hero : activeParty) {
+        hero->clearHitStatus();
+    }
+    for (Monster* enemy : enemies) {
+        enemy->clearHitStatus();
+    }
+}
+
 //tura gracza ------------------------------------------------------------------------------------------
 void Combat::playerTurn(){
     for (Character* hero : activeParty){
         if (!hero->isAlive()) continue;
         if (!areEnemiesAlive()) break;
+        resetHitStatuses();
         hero->onTurnStart();
         hero->resetGuard();
         hero->resetFocus();
@@ -117,10 +163,11 @@ void Combat::playerTurn(){
         while(true){
             
             if (hero->isStunned()) {
-            cout << "\n" << hero->getName() << " is stuck from the Slime attack and can't move!\n";
-            hero->clearStun();
-            pause();
-            break;
+                displayBattlefield(hero);
+                cout << "\n" << hero->getName() << " is stuck from the Slime attack and can't move!\n";
+                hero->clearStun();
+                pause();
+                break;
             }
             else{
                 displayBattlefield(hero);
@@ -144,7 +191,7 @@ void Combat::playerTurn(){
                     displayBattlefield(hero);
                     cout << "\n--- " << hero->getName() << "'s Turn ---\n";
                     cout << "\nChoose action:\n" <<
-                        "1. Attack -> Deal damage to an enemy. [ATK-DEF]\n" <<
+                        "1. Attack -> Deal damage to an enemy.\n" <<
                         "2. Guard -> Negate all damage until the next turn.\n" <<
                         "3. Heal -> Heal yourself for 8 HP.\n" <<
                         "4. Wait -> Skip your turn.\n" <<
@@ -164,6 +211,7 @@ void Combat::playerTurn(){
                         cout << "------------------\n \n";
                         Monster* target = hero->selectTarget(enemies);
                         hero->basicAttack(target);
+                        displayBattlefield(hero, false);
                         pause();
                         break;
                     }
@@ -202,6 +250,7 @@ void Combat::playerTurn(){
                         pause();
                         continue;
                     }
+                    displayBattlefield(hero, false);
                     pause();
                     break;
                 }
@@ -222,11 +271,18 @@ void Combat::playerTurn(){
 //tura przeciwników ------------------------------------------------------------------------------------------
 void Combat::enemyTurn(){
     for (Monster* enemy : enemies){
+        resetHitStatuses();
         cout << "\n--- Enemy Turn ---\n";
-        displayBattlefield(enemy);
-        if (!enemy->isAlive()) continue;
+        if (!enemy->isAlive()) {
+            displayBattlefield(enemy);
+            continue;
+        }
         enemy->applyOverDamage();
-        if (!enemy->isAlive()) continue;
+        if (!enemy->isAlive()) {
+            displayBattlefield(enemy);
+            continue;
+        }
+        displayBattlefield(enemy);
 
         if (enemy->isStunned()) {
         cout << "\n" << enemy->getName() << " is frozen and skips their turn!\n";
@@ -238,6 +294,7 @@ void Combat::enemyTurn(){
 
         if (!isPartyAlive()) break;
         enemy->takeTurn(activeParty);
+        displayBattlefield(enemy, false);
         pause();
     }
 }
@@ -276,5 +333,5 @@ bool Combat::startCombat(){
 
         enemyTurn();
     }
-    return !flee & isPartyAlive();
+    return !flee && isPartyAlive();
 }

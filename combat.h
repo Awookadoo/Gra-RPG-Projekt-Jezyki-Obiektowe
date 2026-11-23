@@ -1,14 +1,10 @@
 #pragma once
 #include "characters.h"
 #include "monsters.h"
-#include "utility.h"
-#include "game.h"
-#include <iostream>
-#include <string>
 #include <vector>
-#include <iomanip>
 using namespace std;
 
+void displayColorName(const string& text, const Character* character, const Character* hasTurn, int colWidth);
 
 class Combat {
     private:
@@ -17,7 +13,8 @@ class Combat {
 
         void displayParty(Character* hasTurn) const;
         void displayEnemies(Character* hasTurn) const;
-        void displayBattlefield(Character* hasTurn) const;
+        void displayBattlefield(Character* hasTurn, bool clearScreen = true) const;
+        void resetHitStatuses();
 
         void playerTurn();
         void enemyTurn();
