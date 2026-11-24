@@ -3,6 +3,7 @@
 #include "utility.h"
 #include "combat.h"
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <iomanip>
@@ -210,8 +211,13 @@ void Combat::playerTurn(){
                         displayBattlefield(hero);
                         cout << "------------------\n \n";
                         Monster* target = hero->selectTarget(enemies);
+                        ostringstream actionMessage;
+                        streambuf* previousOutput = cout.rdbuf(actionMessage.rdbuf());
                         hero->basicAttack(target);
-                        displayBattlefield(hero);
+                        cout.rdbuf(previousOutput);
+                        clear();
+                        displayBattlefield(hero, false);
+                        cout << actionMessage.str();
                         pause();
                         break;
                     }
@@ -246,11 +252,17 @@ void Combat::playerTurn(){
                     if(actionSkill==0){
                         continue;
                     }
-                    if (!hero->useSkill(actionSkill, activeParty, enemies)) {
+                    ostringstream actionMessage;
+                    streambuf* previousOutput = cout.rdbuf(actionMessage.rdbuf());
+                    bool skillUsed = hero->useSkill(actionSkill, activeParty, enemies);
+                    cout.rdbuf(previousOutput);
+                    clear();
+                    displayBattlefield(hero, false);
+                    cout << actionMessage.str();
+                    if (!skillUsed) {
                         pause();
                         continue;
                     }
-                    displayBattlefield(hero);
                     pause();
                     break;
                 }
@@ -272,29 +284,42 @@ void Combat::playerTurn(){
 void Combat::enemyTurn(){
     for (Monster* enemy : enemies){
         resetHitStatuses();
+        clear();
         cout << "\n--- Enemy Turn ---\n";
         if (!enemy->isAlive()) {
             displayBattlefield(enemy);
             continue;
         }
+        ostringstream actionMessage;
+        streambuf* previousOutput = cout.rdbuf(actionMessage.rdbuf());
         enemy->applyOverDamage();
+        cout.rdbuf(previousOutput);
         if (!enemy->isAlive()) {
-            displayBattlefield(enemy);
+            clear();
+            displayBattlefield(enemy, false);
+            cout << actionMessage.str();
+            pause();
             continue;
         }
-        displayBattlefield(enemy);
 
         if (enemy->isStunned()) {
-        cout << "\n" << enemy->getName() << " is frozen and skips their turn!\n";
-        enemy->clearStun();
-        
-        pause();
-        continue;
-    }
+            clear();
+            displayBattlefield(enemy, false);
+            cout << actionMessage.str();
+            cout << "\n" << enemy->getName() << " is frozen and skips their turn!\n";
+            enemy->clearStun();
+
+            pause();
+            continue;
+        }
 
         if (!isPartyAlive()) break;
+        previousOutput = cout.rdbuf(actionMessage.rdbuf());
         enemy->takeTurn(activeParty);
-        displayBattlefield(enemy);
+        cout.rdbuf(previousOutput);
+        clear();
+        displayBattlefield(enemy, false);
+        cout << actionMessage.str();
         pause();
     }
 }

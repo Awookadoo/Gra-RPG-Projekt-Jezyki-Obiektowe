@@ -288,7 +288,7 @@ void Game::startGame(){
 
     while (survived && running) {
         clear();
-        cout << "-----------------------------\n" <<
+        cout << "\n-----------------------------\n" <<
                 "           WAVE " << wave << "\n" <<
                 "-----------------------------\n";
         pause();
